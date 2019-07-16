@@ -100,8 +100,6 @@ def get_initial_saccade(trial):
 	return events[np.argmax(amps)]
 
 # euclidiean distance b/w the target and the endpoint of the initial saccade
-# if you get the size of the display (in cm), the resolution of the display (in pixels), and 
-# the distance they sat from the display (in cm), we can do everything in degrees of visual angle
 def get_accuracy(trial, ppd, xpixels, ypixels):
 
 	for event in trial:
