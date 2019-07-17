@@ -100,6 +100,8 @@ def get_initial_saccade(trial):
 	return events[np.argmax(amps)]
 
 # euclidiean distance b/w the target and the endpoint of the initial saccade
+# if you get the size of the display (in cm), the resolution of the display (in pixels), and 
+# the distance they sat from the display (in cm), we can do everything in degrees of visual angle
 def get_accuracy(trial, ppd, xpixels, ypixels):
 
 	for event in trial:
@@ -118,6 +120,16 @@ def get_accuracy(trial, ppd, xpixels, ypixels):
 	error = np.sqrt((target_x-initial_x)**2 + (target_y-initial_y)**2)
 
 	return error
+
+def get_delay(trial):
+	delay = 0
+	for event in trial:
+		if re.search(' memorydelayduration_test ', event):
+			delay = np.int(event.split('memorydelayduration_test')[1].strip())
+			break
+	return delay
+
+
 
 def get_velocity(trial):
 	
@@ -147,7 +159,7 @@ def run_analysis(task, ppd, xpixels, ypixels, sampling_rate, base_path):
 	files = find_files(path, '*.asc')
 
 	# intialize output
-	columns = ['task', 'group', 'subject', 'outcome', 'latency', 'velocity', 'accuracy']
+	columns = ['task', 'group', 'subject', 'outcome', 'latency', 'velocity', 'accuracy', 'delay']
 	dfs = []
 	bad_trials = []
 
@@ -171,7 +183,8 @@ def run_analysis(task, ppd, xpixels, ypixels, sampling_rate, base_path):
 					latency = get_latency(trial, task)
 					velocity = get_velocity(trial)
 					accuracy = get_accuracy(trial, ppd, xpixels, ypixels)
-					data = [[task, group, subject, outcome, latency, velocity, accuracy]]
+					delay = get_delay(trial)
+					data = [[task, group, subject, outcome, latency, velocity, accuracy, delay]]
 
 					# create output
 					df = pd.DataFrame(data = data, columns=columns)
